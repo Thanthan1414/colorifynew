@@ -4,7 +4,10 @@ import 'tflite_helper.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class RealTimeDetection extends StatefulWidget {
+  const RealTimeDetection({Key? key}) : super(key: key);
+
   @override
+  // ignore: library_private_types_in_public_api
   _RealTimeDetectionState createState() => _RealTimeDetectionState();
 }
 
@@ -43,7 +46,7 @@ class _RealTimeDetectionState extends State<RealTimeDetection> {
           // Run TFLite model
           // Provide voice feedback
           _provideVoiceFeedback("Color detected");
-          Future.delayed(Duration(seconds: 3), () {
+          Future.delayed(const Duration(seconds: 3), () {
             isDetecting = false;
           });
         }
@@ -66,7 +69,7 @@ class _RealTimeDetectionState extends State<RealTimeDetection> {
   @override
   Widget build(BuildContext context) {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
     return AspectRatio(
       aspectRatio: _cameraController!.value.aspectRatio,

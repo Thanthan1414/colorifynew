@@ -5,7 +5,10 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:io';
 
 class UploadPhoto extends StatefulWidget {
+  const UploadPhoto({Key? key}) : super(key: key);
+
   @override
+  // ignore: library_private_types_in_public_api
   _UploadPhotoState createState() => _UploadPhotoState();
 }
 
@@ -56,7 +59,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload Photo'),
+        title: const Text('Upload Photo'),
       ),
       body: Center(
         child: Column(
@@ -64,11 +67,11 @@ class _UploadPhotoState extends State<UploadPhoto> {
           children: <Widget>[
             ElevatedButton(
               onPressed: _pickImage,
-              child: Text('Select Image'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,
               ),
+              child: const Text('Select Image'),
             ),
             if (_imagePath != null) Image.file(File(_imagePath!)),
           ],

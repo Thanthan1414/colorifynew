@@ -5,7 +5,10 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:io';
 
 class CapturePhoto extends StatefulWidget {
+  const CapturePhoto({Key? key}) : super(key: key);
+
   @override
+  // ignore: library_private_types_in_public_api
   _CapturePhotoState createState() => _CapturePhotoState();
 }
 
@@ -65,11 +68,11 @@ class _CapturePhotoState extends State<CapturePhoto> {
   @override
   Widget build(BuildContext context) {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text('Capture Photo'),
+        title: const Text('Capture Photo'),
       ),
       body: Column(
         children: <Widget>[
@@ -79,11 +82,11 @@ class _CapturePhotoState extends State<CapturePhoto> {
           ),
           ElevatedButton(
             onPressed: _captureImage,
-            child: Text('Capture Image'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
             ),
+            child: const Text('Capture Image'),
           ),
           if (_imagePath != null) Image.file(File(_imagePath!)),
         ],

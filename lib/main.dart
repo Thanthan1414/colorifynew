@@ -4,10 +4,12 @@ import 'upload_photo.dart';
 import 'capture_photo.dart';
 
 void main() {
-  runApp(ColorDetectionApp());
+  runApp(const ColorDetectionApp());
 }
 
 class ColorDetectionApp extends StatelessWidget {
+  const ColorDetectionApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,17 +18,19 @@ class ColorDetectionApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ColorDetectionHomePage(),
+      home: const ColorDetectionHomePage(),
     );
   }
 }
 
 class ColorDetectionHomePage extends StatelessWidget {
+  const ColorDetectionHomePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Color Detection'),
+        title: const Text('Color Detection'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -37,42 +41,42 @@ class ColorDetectionHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => RealTimeDetection()),
+                  MaterialPageRoute(builder: (context) => const RealTimeDetection()),
                 );
               },
-              child: Text('Real-time Detection'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,
               ),
+              child: const Text('Real-time Detection'),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => UploadPhoto()),
+                  MaterialPageRoute(builder: (context) => const UploadPhoto()),
                 );
               },
-              child: Text('Upload Photo'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,
               ),
+              child: const Text('Upload Photo'),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CapturePhoto()),
+                  MaterialPageRoute(builder: (context) => const CapturePhoto()),
                 );
               },
-              child: Text('Capture'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,
               ),
+              child: const Text('Capture'),
             ),
           ],
         ),

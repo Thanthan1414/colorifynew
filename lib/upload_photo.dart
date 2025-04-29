@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'tflite_helper.dart';
+import 'package:tflite/tflite.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:io';
 
@@ -23,12 +23,19 @@ class _UploadPhotoState extends State<UploadPhoto> {
   void initState() {
     super.initState();
     _initializeTts();
-    TFLiteHelper.loadModel(); // Load the TFLite model
+    _loadModel(); // Load the TFLite model
   }
 
   Future<void> _initializeTts() async {
     await flutterTts.setLanguage("en-US");
     await flutterTts.setPitch(1.0);
+  }
+
+  Future<void> _loadModel() async {
+    await Tflite.loadModel(
+      model: 'assets/model.tflite',
+      labels: 'assets/labels.txt',
+    );
   }
 
   Future<void> _pickImage() async {
@@ -42,8 +49,14 @@ class _UploadPhotoState extends State<UploadPhoto> {
   }
 
   Future<void> _detectColors(String imagePath) async {
-    var recognitions = await TFLiteHelper.detectColors(imagePath);
-    if (recognitions.isNotEmpty) {
+    var recognitions = await Tflite.runModelOnImage(
+      path: imagePath,
+      numResults: 5, // Number of results to return
+      threshold: 0.5, // Confidence threshold
+    );
+
+    // Null check for recognitions
+    if (recognitions != null && recognitions.isNotEmpty) {
       // Get the label of the first detected color
       String detectedColor = recognitions[0]['label'];
       setState(() {
@@ -68,8 +81,12 @@ class _UploadPhotoState extends State<UploadPhoto> {
   @override
   void dispose() {
     flutterTts.stop();
-    TFLiteHelper.disposeModel(); // Dispose of the TFLite model
+    _disposeModel();
     super.dispose();
+  }
+
+  Future<void> _disposeModel() async {
+    await Tflite.close();
   }
 
   @override

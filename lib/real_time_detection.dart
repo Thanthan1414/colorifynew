@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'tflite_helper.dart';
+import 'package:tflite/tflite.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class RealTimeDetection extends StatefulWidget {
   const RealTimeDetection({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
-  _RealTimeDetectionState createState() => _RealTimeDetectionState();
+  RealTimeDetectionState createState() => RealTimeDetectionState(); // Made public
 }
 
-class _RealTimeDetectionState extends State<RealTimeDetection> {
+class RealTimeDetectionState extends State<RealTimeDetection> { // Made public
   CameraController? _cameraController;
   List<CameraDescription>? cameras;
   bool isDetecting = false;
@@ -24,7 +23,7 @@ class _RealTimeDetectionState extends State<RealTimeDetection> {
     super.initState();
     _initializeCamera();
     _initializeTts();
-    TFLiteHelper.loadModel(); // Load the TFLite model
+    _loadModel(); // Load the TFLite model
   }
 
   Future<void> _initializeCamera() async {
@@ -40,39 +39,55 @@ class _RealTimeDetectionState extends State<RealTimeDetection> {
     await flutterTts.setPitch(1.0);
   }
 
+  Future<void> _loadModel() async {
+    await Tflite.loadModel(
+      model: 'assets/model.tflite',
+      labels: 'assets/labels.txt',
+    );
+  }
+
   void _startDetection() {
-    if (_cameraController != null) {
-      _cameraController!.startImageStream((CameraImage image) async {
-        if (!isDetecting) {
-          isDetecting = true;
+    _cameraController!.startImageStream((CameraImage image) async {
+      if (!isDetecting) {
+        isDetecting = true;
 
-          // Run the TFLite model on the image
-          var recognitions = await TFLiteHelper.runModelOnFrame(image);
+        // Run the TFLite model on the image
+        var recognitions = await _runModelOnFrame(image);
 
-          if (recognitions.isNotEmpty) {
-            // Extract the label of the first recognition
-            String detectedColor = recognitions[0]['label'];
-            setState(() {
-              _detectedColor = detectedColor; // Update the detected color
-              _warningMessage = null; // Clear any previous warning
-            });
-            _provideVoiceFeedback("Detected color is $detectedColor");
-          } else {
-            setState(() {
-              _detectedColor = "No color detected"; // Update if no color is detected
-              _warningMessage =
-                  "Warning: Detection failed. This might be due to poor lighting, low camera quality, or too many objects with different colors.";
-            });
-            _provideVoiceFeedback("No color detected. Please check lighting or camera quality.");
-          }
-
-          // Delay to avoid continuous detections
-          Future.delayed(const Duration(seconds: 3), () {
-            isDetecting = false;
+        if (recognitions.isNotEmpty) {
+          // Extract the label of the first recognition
+          String detectedColor = recognitions[0]['label'];
+          setState(() {
+            _detectedColor = detectedColor; // Update the detected color
+            _warningMessage = null; // Clear any previous warning
           });
+          _provideVoiceFeedback("Detected color is $detectedColor");
+        } else {
+          setState(() {
+            _detectedColor = "No color detected"; // Update if no color is detected
+            _warningMessage =
+                "Warning: Detection failed. This might be due to poor lighting, low camera quality, or too many objects with different colors.";
+          });
+          _provideVoiceFeedback("No color detected. Please check lighting or camera quality.");
         }
-      });
-    }
+
+        // Delay to avoid continuous detections
+        Future.delayed(const Duration(seconds: 3), () {
+          isDetecting = false;
+        });
+      }
+    });
+  }
+
+  Future<List<dynamic>> _runModelOnFrame(CameraImage image) async {
+    return await Tflite.runModelOnFrame(
+          bytesList: image.planes.map((plane) => plane.bytes).toList(),
+          imageHeight: image.height,
+          imageWidth: image.width,
+          numResults: 5, // Number of results to return
+          threshold: 0.3, // Confidence threshold
+        ) ??
+        []; // Return an empty list if null
   }
 
   Future<void> _provideVoiceFeedback(String message) async {
@@ -82,9 +97,13 @@ class _RealTimeDetectionState extends State<RealTimeDetection> {
   @override
   void dispose() {
     _cameraController?.dispose();
-    TFLiteHelper.disposeModel();
     flutterTts.stop();
+    _disposeModel();
     super.dispose();
+  }
+
+  Future<void> _disposeModel() async {
+    await Tflite.close();
   }
 
   @override
